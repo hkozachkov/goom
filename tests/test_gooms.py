@@ -1,17 +1,7 @@
 import jax
 import jax.numpy as jnp
 
-from goom.goom import to_goom, from_goom
-
-
-def generate_random_gooms(key: jax.Array, shape: tuple[int, ...]) -> jax.Array:
-    minval = jnp.finfo(jnp.float16).min
-    maxval = jnp.finfo(jnp.float16).max
-    floats = jax.random.uniform(
-        key, shape, dtype=jnp.float32, minval=minval, maxval=maxval
-    )
-    gooms = to_goom(floats)
-    return gooms
+from goom.goom import to_goom, from_goom, generate_random_gooms
 
 
 def test_generate_random_gooms_no_nans():

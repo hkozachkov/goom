@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 import pytest
 
-from test_gooms import generate_random_gooms
+from goom.goom import generate_random_gooms
 from goom.operations import (
     log_add_exp,
     log_sum_exp,

@@ -97,3 +97,13 @@ def to_goom(x: jax.Array) -> jax.Array:
 
 def from_goom(x: jax.Array) -> jax.Array:
     return goom_exp(x).real
+
+
+def generate_random_gooms(key: jax.Array, shape: tuple[int, ...]) -> jax.Array:
+    minval = jnp.finfo(jnp.float16).min
+    maxval = jnp.finfo(jnp.float16).max
+    floats = jax.random.uniform(
+        key, shape, dtype=jnp.float32, minval=minval, maxval=maxval
+    )
+    gooms = to_goom(floats)
+    return gooms
