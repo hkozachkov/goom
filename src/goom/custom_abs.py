@@ -31,5 +31,3 @@ def _goom_abs_bwd(residuals: jax.Array, g: jax.Array) -> Tuple[jax.Array]:
 
 
 goom_abs.defvjp(_goom_abs_fwd, _goom_abs_bwd)
-
-

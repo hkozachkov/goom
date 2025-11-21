@@ -17,4 +17,3 @@ def test_custom_gradient_matches_spec():
         eps = jnp.finfo(x_arr.dtype).eps
         expected = x_arr + (eps if x >= 0 else -eps)
         assert jnp.allclose(grad, expected)
-

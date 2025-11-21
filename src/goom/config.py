@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 
+
 @dataclass
 class Config:
 
@@ -13,5 +14,6 @@ class Config:
 
     float_dtype: jnp.dtype = jnp.float32
     "Float dtype of real logarithms and components of complex logarithms."
+
 
 config = Config()
