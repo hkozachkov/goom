@@ -88,7 +88,7 @@ goom_log.defvjp(_goom_log_fwd, _goom_log_bwd)
 def to_goom(x: jax.Array) -> jax.Array:
     abs_x = goom_abs(x)
     log_abs_x = goom_log(abs_x)
-    real = jnp.astype(log_abs_x, config.float_dtype)
+    real = jnp.astype(log_abs_x, jnp.float32)
     x_is_neg = x < 0
     # todo: allow this to return real tensors if config.cast_all_logs_to_complex is False and x is
     # non-negative
