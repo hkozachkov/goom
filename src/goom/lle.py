@@ -5,7 +5,23 @@ from jax import lax
 import goom.goom as goom
 import goom.lmme as lmme
 import goom.operations as oprs
-import goom.utils as utils
+
+
+def randn_like(x, key, dtype=None):
+    return jax.random.normal(key, shape=x.shape, dtype=(dtype or x.dtype))
+
+
+def normalize(x, axis=-1, eps=1e-12):
+    norm = jnp.linalg.norm(x, axis=axis, keepdims=True)
+    return x / (norm + eps)
+
+
+def rand_like_normalized(jac_vals, axis, key):
+    return normalize(
+        randn_like(jac_vals[..., 0, :1, :], key),
+        axis=axis,
+    )
+
 
 
 def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
@@ -15,7 +31,7 @@ def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
 
     # Split off a subkey for the initial vector
     key, u0_key = jax.random.split(key)
-    u0 = utils.rand_like_normalized(jac_vals, axis=-1, key=u0_key)
+    u0 = rand_like_normalized(jac_vals, axis=-1, key=u0_key)
 
     log_jac_prefix_products = lax.associative_scan(
         lmme.log_matmul_exp, log_jac_vals, axis=0
@@ -37,7 +53,7 @@ def jax_estimate_lle_sequential(jacobians, key, dt=1.0, eps=1e-12):
 
     # random initial unit vector in R^D
     v0 = jax.random.normal(key, shape=(D,))
-    v0 = utils.normalize(v0, axis=0, eps=eps)
+    v0 = normalize(v0, axis=0, eps=eps)
 
     def step(v, J):
         # propagate tangent vector
