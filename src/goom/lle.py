@@ -1,4 +1,3 @@
-
 import jax
 import jax.numpy as jnp
 from jax import lax
@@ -18,7 +17,9 @@ def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
     key, u0_key = jax.random.split(key)
     u0 = utils.rand_like_normalized(jac_vals, axis=-1, key=u0_key)
 
-    log_jac_prefix_products = lax.associative_scan(lmme.log_matmul_exp, log_jac_vals, axis=0)
+    log_jac_prefix_products = lax.associative_scan(
+        lmme.log_matmul_exp, log_jac_vals, axis=0
+    )
     log_end_state = lmme.log_matmul_exp(u0, log_jac_prefix_products[-1])
 
     est_lle = oprs.log_sum_exp(log_end_state * 2, axis=-1).real / (2 * n_steps * dt)
