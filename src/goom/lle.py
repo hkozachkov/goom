@@ -23,7 +23,6 @@ def rand_like_normalized(jac_vals, axis, key):
     )
 
 
-
 def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
     """Estimate the largest Lyapunov exponent from log-Jacobians."""
     n_steps = jac_vals.shape[-3]

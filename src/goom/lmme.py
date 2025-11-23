@@ -109,7 +109,7 @@ def compare_lmme_implementations(key, shape=(3, 2, 4)):
         print()
 
 
-def benchmark_lmme_implementations(key, repeats=5, number=10):
+def benchmark_lmme_implementations(key, repeats=5, number=10, shapes=shapes):
     """
     Measures and prints the running times for each lmme implementation across various shapes.
     """
