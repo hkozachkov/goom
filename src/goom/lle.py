@@ -42,7 +42,7 @@ def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
     key, u0_key = jax.random.split(key)
     u0 = rand_like_normalized(jac_vals, axis=-1, key=u0_key)
 
-    # apply Jacobians from last to first: M[T] = J[T] @ ... @ J[0] in goom space
+    # multiply Jacobians from last to first: M[T] = J[T] @ ... @ J[0] in goom space and grab last cumulative product
     log_jac_product = lax.associative_scan(
         lmme.log_matmul_exp, jnp.flip(log_jac_vals, axis=0), axis=0
     )[-1]
@@ -50,7 +50,10 @@ def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
     # M[T] @ u[0] in goom space
     log_end_state = lmme.log_matmul_exp(u0, log_jac_product)
 
-    return oprs.log_sum_exp(log_end_state * 2, axis=-1).real / (2 * T * dt)
+    # get final LLE estimate
+    lambda_max = oprs.log_sum_exp(log_end_state * 2, axis=-1).real / (2 * T * dt)
+
+    return lambda_max.item()
 
 
 def jax_estimate_lle_sequential(jacobians, key, dt=1.0, eps=1e-12):
