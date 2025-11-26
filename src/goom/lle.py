@@ -24,21 +24,36 @@ def rand_like_normalized(jac_vals, axis, key):
 
 
 def jax_estimate_lle_parallel(jac_vals, key, dt=1.0):
-    """Estimate the largest Lyapunov exponent from log-Jacobians."""
-    n_steps = jac_vals.shape[-3]
-    log_jac_vals = goom.to_goom(jac_vals)  # transposed L→R log-Jacobians
+    
+    """
+    Estimate the largest Lyapunov exponent from Jacobians, in parallel
+    
+    jacobians: array of shape (T, D, D)
+               J[t] is the Jacobian at time step t
+    key:       jax.random.PRNGKey
+    dt:        time step between Jacobians (default 1.0)
+    
+    """
+    # get log_jac_vals
+    T = jac_vals.shape[-3]
+    log_jac_vals = goom.to_goom(jac_vals)
 
-    # Split off a subkey for the initial vector
+    # initialize random unit vector u[0]
     key, u0_key = jax.random.split(key)
     u0 = rand_like_normalized(jac_vals, axis=-1, key=u0_key)
 
-    log_jac_prefix_products = lax.associative_scan(
-        lmme.log_matmul_exp, log_jac_vals, axis=0
-    )
-    log_end_state = lmme.log_matmul_exp(u0, log_jac_prefix_products[-1])
+    # multiply Jacobians from last to first: M[T] = J[T] @ ... @ J[0] in goom space and grab last cumulative product
+    log_jac_product = lax.associative_scan(
+        lmme.log_matmul_exp, jnp.flip(log_jac_vals, axis=0), axis=0
+    )[-1]
 
-    est_lle = oprs.log_sum_exp(log_end_state * 2, axis=-1).real / (2 * n_steps * dt)
-    return est_lle
+    # M[T] @ u[0] in goom space
+    log_end_state = lmme.log_matmul_exp(u0, log_jac_product)
+
+    # get final LLE estimate
+    lambda_max = oprs.log_sum_exp(log_end_state * 2, axis=-1).real / (2 * T * dt)
+
+    return lambda_max.item()
 
 
 def jax_estimate_lle_sequential(jacobians, key, dt=1.0, eps=1e-12):
