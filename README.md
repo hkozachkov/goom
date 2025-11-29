@@ -2,20 +2,12 @@
 
 JAX version of [generalized_orders_of_magnitude](https://github.com/glassroom/generalized_orders_of_magnitude).
 
-## Not profiled or optimized yet
-
-"Damn let me get my shit off first….DAAAAAMN”
+Note: This code has not been profiled or optimized yet.
 
 ## Setup
 
 ``` bash
 uv sync --extra dev
-```
-
-## Run the demo
-
-``` bash
-uv run python -m goom
 ```
 
 ## Run the tests
@@ -24,8 +16,14 @@ uv run python -m goom
 uv run --extra dev pytest
 ```
 
-## Run a benchmark
+## Run some benchmarks
 
+Benchmark basic log_matmul_exp (LMME) functionality
 ``` bash
-uv run python -m goom.lmme
+uv run python -m goom.lmme 
+```
+
+Benchmark GPU speedup for Largest Lyapunov Exponent (LLE) computation. Make sure you have a GPU.
+``` bash
+uv run python -m goom.lle
 ```
